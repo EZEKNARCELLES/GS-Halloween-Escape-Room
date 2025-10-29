@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Strategic Solutions - Halloween Escape Room</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+            color: #ff6b00;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Halloween Background Effects */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ctext x='50' y='50' font-size='40' text-anchor='middle' fill='%23ff6b00' opacity='0.05'%3E🎃%3C/text%3E%3C/svg%3E"),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ctext x='60' y='60' font-size='30' text-anchor='middle' fill='%23ff6b00' opacity='0.03'%3E🦇%3C/text%3E%3C/svg%3E");
+            background-position: 0 0, 50px 50px;
+            background-size: 100px 100px, 120px 120px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3em;
+            margin: 30px 0;
+            text-shadow: 3px 3px 6px rgba(255, 107, 0, 0.5);
+            animation: flicker 2s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .game-area {
+            background: rgba(0, 0, 0, 0.8);
+            border: 3px solid #ff6b00;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 0 30px rgba(255, 107, 0, 0.5);
+        }
+
+        .room-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .room-card {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            border: 2px solid #ff6b00;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 107, 0, 0.6);
+        }
+
+        .room-card.completed {
+            background: linear-gradient(135deg, #2a2a2a, #3a3a3a);
+            border-color: #4CAF50;
+        }
+
+        .room-card.completed::after {
+            content: "✓";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #4CAF50;
+            font-size: 24px;
+        }
+
+        .room-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .room-title {
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+
+        .room-status {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .challenge-container {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .challenge-container.active {
+            display: block;
+        }
+
+        .challenge-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .challenge-content {
+            background: rgba(26, 26, 26, 0.9);
+            border: 1px solid #ff6b00;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        button {
+            background: linear-gradient(135deg, #ff6b00, #ff8c00);
+            color: black;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            margin: 10px 5px;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255, 107, 0, 0.5);
+        }
+
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        input[type="text"], input[type="number"], select {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #ff6b00;
+            color: #ff6b00;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            margin: 10px 5px;
+        }
+
+        .code-display {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #ff6b00;
+            border-radius: 10px;
+        }
+
+        .code-digits {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .code-digit {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #ff6b00;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .code-digit.revealed {
+            background: rgba(255, 107, 0, 0.2);
+            animation: pulse 0.5s;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .final-door {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            border: 3px solid #ff6b00;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .door-icon {
+            font-size: 5em;
+            margin: 20px 0;
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #2a2a2a, #3a3a3a);
+            border: 3px solid #4CAF50;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .success-message.active {
+            display: block;
+            animation: celebrate 1s;
+        }
+
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #ff6b00;
+            animation: fall linear;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        /* Challenge-specific styles */
+        .quiz-option {
+            display: block;
+            width: 100%;
+            text-align: left;
+            margin: 10px 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #ff6b00;
+        }
+
+        .quiz-option:hover {
+            background: rgba(255, 107, 0, 0.1);
+        }
+
+        .drag-item {
+            background: #ff6b00;
+            color: black;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: move;
+            display: inline-block;
+        }
+
+        .drop-zone {
+            min-height: 50px;
+            border: 2px dashed #ff6b00;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .drop-zone.drag-over {
+            background: rgba(255, 107, 0, 0.2);
+        }
+
+        .calculator-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            max-width: 300px;
+            margin: 20px auto;
+        }
+
+        .calc-btn {
+            padding: 20px;
+            font-size: 1.2em;
+        }
+
+        #calcDisplay {
+            width: 100%;
+            max-width: 300px;
+            margin: 10px auto;
+            display: block;
+            text-align: right;
+            font-size: 1.5em;
+        }
+
+        .client-card {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #ff6b00;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 5px;
+        }
+
+        .feedback {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .feedback.correct {
+            background: rgba(76, 175, 80, 0.3);
+            border: 2px solid #4CAF50;
+            color: #4CAF50;
+        }
+
+        .feedback.incorrect {
+            background: rgba(244, 67, 54, 0.3);
+            border: 2px solid #f44336;
+            color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎃 Global Strategic Solutions Halloween Escape Room 🎃</h1>
+        
+        <div class="game-area">
+            <!-- Main Menu -->
+            <div id="mainMenu" class="challenge-container active">
+                <div class="challenge-header">
+                    <h2>Welcome to the Haunted Office!</h2>
+                    <p>You're trapped in the Global Strategic Solutions office on Halloween night! 
+                    Find the 4-digit code by completing challenges in each department to escape!</p>
+                </div>
+
+                <div class="code-display">
+                    <h3>Escape Code</h3>
+                    <div class="code-digits">
+                        <div class="code-digit" id="digit1">?</div>
+                        <div class="code-digit" id="digit2">?</div>
+                        <div class="code-digit" id="digit3">?</div>
+                        <div class="code-digit" id="digit4">?</div>
+                    </div>
+                    <p id="codeHint">Complete all 4 rooms to reveal the code!</p>
+                </div>
+
+                <div class="room-selection">
+                    <div class="room-card" onclick="startChallenge(1)" id="room1">
+                        <div class="room-icon">💼</div>
+                        <div class="room-title">Legal Support</div>
+                        <div class="room-status">The Contract Crypt</div>
+                    </div>
+                    <div class="room-card" onclick="startChallenge(2)" id="room2">
+                        <div class="room-icon">📊</div>
+                        <div class="room-title">Accounting</div>
+                        <div class="room-status">The Ledger Labyrinth</div>
+                    </div>
+                    <div class="room-card" onclick="startChallenge(3)" id="room3">
+                        <div class="room-icon">🏢</div>
+                        <div class="room-title">Real Estate</div>
+                        <div class="room-status">The Property Puzzle</div>
+                    </div>
+                    <div class="room-card" onclick="startChallenge(4)" id="room4">
+                        <div class="room-icon">📞</div>
+                        <div class="room-title">Customer Service</div>
+                        <div class="room-status">The Call Center Curse</div>
+                    </div>
+                </div>
+
+                <div class="final-door">
+                    <div class="door-icon">🚪</div>
+                    <h3>Final Door</h3>
+                    <p>Enter the 4-digit code to escape!</p>
+                    <input type="text" id="finalCode" placeholder="Enter 4-digit code" maxlength="4" pattern="\d{4}">
+                    <button onclick="checkFinalCode()">Unlock Door</button>
+                    <div id="doorFeedback"></div>
+                </div>
+            </div>
+
+            <!-- Challenge 1: Legal Support -->
+            <div id="challenge1" class="challenge-container">
+                <div class="challenge-header">
+                    <h2>💼 The Contract Crypt</h2>
+                    <p>The ghost lawyers need help sorting these haunted contracts!</p>
+                </div>
+                <div class="challenge-content">
+                    <h3>Legal Document Sorting Challenge</h3>
+                    <p>Drag and drop the legal documents into the correct category to reveal your number!</p>
+                    
+                    <div id="dragItems">
+                        <div class="drag-item" draggable="true" data-category="mortgage">Mortgage Agreement</div>
+                        <div class="drag-item" draggable="true" data-category="bankruptcy">Chapter 7 Filing</div>
+                        <div class="drag-item" draggable="true" data-category="mortgage">Property Deed</div>
+                        <div class="drag-item" draggable="true" data-category="merger">Acquisition Contract</div>
+                        <div class="drag-item" draggable="true" data-category="bankruptcy">Creditor List</div>
+                        <div class="drag-item" draggable="true" data-category="merger">Due Diligence Report</div>
+                    </div>
+
+                    <h4>Categories:</h4>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                        <div>
+                            <h5>Mortgaging</h5>
+                            <div class="drop-zone" data-category="mortgage"></div>
+                        </div>
+                        <div>
+                            <h5>Bankruptcy</h5>
+                            <div class="drop-zone" data-category="bankruptcy"></div>
+                        </div>
+                        <div>
+                            <h5>Mergers</h5>
+                            <div class="drop-zone" data-category="merger"></div>
+                        </div>
+                    </div>
+
+                    <button onclick="checkLegalChallenge()">Submit Sorting</button>
+                    <div id="legalFeedback"></div>
+                </div>
+                <button onclick="backToMenu()">Back to Main Menu</button>
+            </div>
+
+            <!-- Challenge 2: Accounting -->
+            <div id="challenge2" class="challenge-container">
+                <div class="challenge-header">
+                    <h2>📊 The Ledger Labyrinth</h2>
+                    <p>The phantom accountants left a spooky calculation puzzle!</p>
+                </div>
+                <div class="challenge-content">
+                    <h3>Halloween Budget Calculator</h3>
+                    <p>Calculate the total Halloween party budget for Global Strategic's offices!</p>
+                    
+                    <div style="background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px; margin: 20px 0;">
+                        <h4>Office Halloween Expenses:</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li>🎃 US Office (Burlington): $432 for decorations</li>
+                            <li>🦇 Philippines Office (Manila): $287 for costumes</li>
+                            <li>🕷️ Bacolod Site: $156 for treats</li>
+                            <li>👻 Cebu Site: $194 for party supplies</li>
+                        </ul>
+                        <p><strong>Question: What's the total budget? Subtract $100 (discount) and divide by 23 to get your code digit!</strong></p>
+                    </div>
+
+                    <div>
+                        <input type="text" id="calcDisplay" readonly value="0">
+                        <div class="calculator-buttons">
+                            <button class="calc-btn" onclick="appendCalc('7')">7</button>
+                            <button class="calc-btn" onclick="appendCalc('8')">8</button>
+                            <button class="calc-btn" onclick="appendCalc('9')">9</button>
+                            <button class="calc-btn" onclick="appendCalc('/')">/</button>
+                            <button class="calc-btn" onclick="appendCalc('4')">4</button>
+                            <button class="calc-btn" onclick="appendCalc('5')">5</button>
+                            <button class="calc-btn" onclick="appendCalc('6')">6</button>
+                            <button class="calc-btn" onclick="appendCalc('*')">×</button>
+                            <button class="calc-btn" onclick="appendCalc('1')">1</button>
+                            <button class="calc-btn" onclick="appendCalc('2')">2</button>
+                            <button class="calc-btn" onclick="appendCalc('3')">3</button>
+                            <button class="calc-btn" onclick="appendCalc('-')">-</button>
+                            <button class="calc-btn" onclick="appendCalc('0')">0</button>
+                            <button class="calc-btn" onclick="clearCalc()">C</button>
+                            <button class="calc-btn" onclick="calculate()">=</button>
+                            <button class="calc-btn" onclick="appendCalc('+')">+</button>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin: 20px 0;">
+                        <input type="number" id="accountingAnswer" placeholder="Enter final answer">
+                        <button onclick="checkAccountingChallenge()">Submit Answer</button>
+                    </div>
+                    <div id="accountingFeedback"></div>
+                </div>
+                <button onclick="backToMenu()">Back to Main Menu</button>
+            </div>
+
+            <!-- Challenge 3: Real Estate -->
+            <div id="challenge3" class="challenge-container">
+                <div class="challenge-header">
+                    <h2>🏢 The Property Puzzle</h2>
+                    <p>Match the haunted properties with their perfect virtual assistants!</p>
+                </div>
+                <div class="challenge-content">
+                    <h3>Property Management Matching Game</h3>
+                    <p>Match each spooky property with the right service from Global Strategic!</p>
+                    
+                    <div class="client-card">
+                        <h4>👻 Haunted Mansion Client</h4>
+                        <p>Needs: Regular maintenance scheduling and tenant communication</p>
+                        <select id="match1">
+                            <option value="">Select a service...</option>
+                            <option value="va">Virtual Assistant Services</option>
+                            <option value="accounting">Accounting Services</option>
+                            <option value="marketing">Digital Marketing</option>
+                            <option value="it">IT Support</option>
+                        </select>
+                    </div>
+
+                    <div class="client-card">
+                        <h4>🦇 Vampire Villa Owner</h4>
+                        <p>Needs: Monthly financial reports and rent collection tracking</p>
+                        <select id="match2">
+                            <option value="">Select a service...</option>
+                            <option value="va">Virtual Assistant Services</option>
+                            <option value="accounting">Accounting Services</option>
+                            <option value="marketing">Digital Marketing</option>
+                            <option value="it">IT Support</option>
+                        </select>
+                    </div>
+
+                    <div class="client-card">
+                        <h4>🕷️ Spider Web Apartments</h4>
+                        <p>Needs: Online presence and social media management for listings</p>
+                        <select id="match3">
+                            <option value="">Select a service...</option>
+                            <option value="va">Virtual Assistant Services</option>
+                            <option value="accounting">Accounting Services</option>
+                            <option value="marketing">Digital Marketing</option>
+                            <option value="it">IT Support</option>
+                        </select>
+                    </div>
+
+                    <div class="client-card">
+                        <h4>🎃 Pumpkin Patch Properties</h4>
+                        <p>Needs: Database management and automated booking systems</p>
+                        <select id="match4">
+                            <option value="">Select a service...</option>
+                            <option value="va">Virtual Assistant Services</option>
+                            <option value="accounting">Accounting Services</option>
+                            <option value="marketing">Digital Marketing</option>
+                            <option value="it">IT Support</option>
+                        </select>
+                    </div>
+
+                    <button onclick="checkRealEstateChallenge()">Submit Matches</button>
+                    <div id="realEstateFeedback"></div>
+                </div>
+                <button onclick="backToMenu()">Back to Main Menu</button>
+            </div>
+
+            <!-- Challenge 4: Customer Service -->
+            <div id="challenge4" class="challenge-container">
+                <div class="challenge-header">
+                    <h2>📞 The Call Center Curse</h2>
+                    <p>Answer the ghostly customer service quiz to break the curse!</p>
+                </div>
+                <div class="challenge-content">
+                    <h3>Customer Service Excellence Quiz</h3>
+                    <p>Show your knowledge of Global Strategic's customer service principles!</p>
+                    
+                    <div id="quizContainer">
+                        <h4>Question 1: What is Global Strategic's main approach to customer service?</h4>
+                        <button class="quiz-option" onclick="selectQuizAnswer(1, 'a')">A) One-size-fits-all solutions</button>
+                        <button class="quiz-option" onclick="selectQuizAnswer(1, 'b')">B) Customized solutions for individual client needs</button>
+                        <button class="quiz-option" onclick="selectQuizAnswer(1, 'c')">C) Automated responses only</button>
+                        <button class="quiz-option" onclick="selectQuizAnswer(1, 'd')">D) Limited support hours</button>
+                    </div>
+
+                    <div id="quizFeedback"></div>
+                </div>
+                <button onclick="backToMenu()">Back to Main Menu</button>
+            </div>
+
+            <!-- Success Message -->
+            <div id="successMessage" class="success-message">
+                <h2>🎉 Congratulations! 🎉</h2>
+                <div style="font-size: 5em; margin: 20px 0;">🎃👻🦇</div>
+                <p style="font-size: 1.5em; margin: 20px 0;">You've escaped the haunted Global Strategic office!</p>
+                <p>Your problem-solving skills in Legal Support, Accounting, Real Estate, and Customer Service saved the day!</p>
+                <p style="margin-top: 30px;">Happy Halloween from Global Strategic Solutions! 🎃</p>
+                <button onclick="resetGame()">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let gameState = {
+            digits: [null, null, null, null],
+            completedRooms: [],
+            currentChallenge: null
+        };
+
+        // Drag and Drop functionality for Legal Challenge
+        let draggedItem = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize drag and drop
+            const dragItems = document.querySelectorAll('.drag-item');
+            const dropZones = document.querySelectorAll('.drop-zone');
+
+            dragItems.forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('drop', handleDrop);
+                zone.addEventListener('dragleave', handleDragLeave);
+            });
+        });
+
+        function handleDragStart(e) {
+            draggedItem = e.target;
+            e.target.style.opacity = '0.5';
+        }
+
+        function handleDragEnd(e) {
+            e.target.style.opacity = '';
+            draggedItem = null;
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            e.currentTarget.classList.add('drag-over');
+            return false;
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            
+            if (draggedItem) {
+                e.currentTarget.appendChild(draggedItem);
+            }
+            return false;
+        }
+
+        // Challenge functions
+        function startChallenge(roomNumber) {
+            if (gameState.completedRooms.includes(roomNumber)) {
+                alert("You've already completed this room! The digit is: " + gameState.digits[roomNumber - 1]);
+                return;
+            }
+            
+            document.getElementById('mainMenu').classList.remove('active');
+            document.getElementById('challenge' + roomNumber).classList.add('active');
+            gameState.currentChallenge = roomNumber;
+        }
+
+        function backToMenu() {
+            document.querySelectorAll('.challenge-container').forEach(container => {
+                container.classList.remove('active');
+            });
+            document.getElementById('mainMenu').classList.add('active');
+        }
+
+        // Legal Challenge
+        function checkLegalChallenge() {
+            const dropZones = document.querySelectorAll('.drop-zone');
+            let correct = true;
+            
+            dropZones.forEach(zone => {
+                const category = zone.dataset.category;
+                const items = zone.querySelectorAll('.drag-item');
+                
+                items.forEach(item => {
+                    if (item.dataset.category !== category) {
+                        correct = false;
+                    }
+                });
+                
+                // Check if all items are placed
+                if (category === 'mortgage' && items.length !== 2) correct = false;
+                if (category === 'bankruptcy' && items.length !== 2) correct = false;
+                if (category === 'merger' && items.length !== 2) correct = false;
+            });
+
+            const feedback = document.getElementById('legalFeedback');
+            if (correct) {
+                const digit = 7;
+                gameState.digits[0] = digit;
+                gameState.completedRooms.push(1);
+                feedback.className = 'feedback correct';
+                feedback.innerHTML = `✅ Excellent legal sorting! You found the number: <strong>${digit}</strong>`;
+                updateCodeDisplay();
+                document.getElementById('room1').classList.add('completed');
+                setTimeout(backToMenu, 2000);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.innerHTML = '❌ Not quite right. Make sure each document is in the correct category!';
+            }
+        }
+
+        // Accounting Challenge
+        let calcDisplay = document.getElementById('calcDisplay');
+
+        function appendCalc(value) {
+            if (calcDisplay.value === '0') {
+                calcDisplay.value = value;
+            } else {
+                calcDisplay.value += value;
+            }
+        }
+
+        function clearCalc() {
+            calcDisplay.value = '0';
+        }
+
+        function calculate() {
+            try {
+                calcDisplay.value = eval(calcDisplay.value);
+            } catch (e) {
+                calcDisplay.value = 'Error';
+            }
+        }
+
+        function checkAccountingChallenge() {
+            const answer = document.getElementById('accountingAnswer').value;
+            const feedback = document.getElementById('accountingFeedback');
+            
+            // (432 + 287 + 156 + 194 - 100) / 23 = 969 / 23 = 42.13, round to 42, take last digit = 2
+            if (answer === '42') {
+                const digit = 2;
+                gameState.digits[1] = digit;
+                gameState.completedRooms.push(2);
+                feedback.className = 'feedback correct';
+                feedback.innerHTML = `✅ Perfect calculation! You found the number: <strong>${digit}</strong>`;
+                updateCodeDisplay();
+                document.getElementById('room2').classList.add('completed');
+                setTimeout(backToMenu, 2000);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.innerHTML = '❌ Try again! Remember: Add all expenses, subtract the discount, then divide by 23.';
+            }
+        }
+
+        // Real Estate Challenge
+        function checkRealEstateChallenge() {
+            const match1 = document.getElementById('match1').value;
+            const match2 = document.getElementById('match2').value;
+            const match3 = document.getElementById('match3').value;
+            const match4 = document.getElementById('match4').value;
+            const feedback = document.getElementById('realEstateFeedback');
+            
+            if (match1 === 'va' && match2 === 'accounting' && match3 === 'marketing' && match4 === 'it') {
+                const digit = 5;
+                gameState.digits[2] = digit;
+                gameState.completedRooms.push(3);
+                feedback.className = 'feedback correct';
+                feedback.innerHTML = `✅ Perfect matching! You found the number: <strong>${digit}</strong>`;
+                updateCodeDisplay();
+                document.getElementById('room3').classList.add('completed');
+                setTimeout(backToMenu, 2000);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.innerHTML = '❌ Not quite! Think about which service best fits each property\'s needs.';
+            }
+        }
+
+        // Customer Service Challenge
+        let quizAnswers = {};
+
+        function selectQuizAnswer(question, answer) {
+            quizAnswers[question] = answer;
+            const feedback = document.getElementById('quizFeedback');
+            
+            if (answer === 'b') {
+                const digit = 8;
+                gameState.digits[3] = digit;
+                gameState.completedRooms.push(4);
+                feedback.className = 'feedback correct';
+                feedback.innerHTML = `✅ Correct! Global Strategic customizes solutions for each client. You found the number: <strong>${digit}</strong>`;
+                updateCodeDisplay();
+                document.getElementById('room4').classList.add('completed');
+                setTimeout(backToMenu, 2000);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.innerHTML = '❌ Try again! Think about Global Strategic\'s core values.';
+            }
+        }
+
+        // Update code display
+        function updateCodeDisplay() {
+            gameState.digits.forEach((digit, index) => {
+                if (digit !== null) {
+                    const digitElement = document.getElementById('digit' + (index + 1));
+                    digitElement.textContent = digit;
+                    digitElement.classList.add('revealed');
+                }
+            });
+            
+            if (gameState.completedRooms.length === 4) {
+                document.getElementById('codeHint').textContent = 'All digits found! Enter the code to escape!';
+            }
+        }
+
+        // Check final code
+        function checkFinalCode() {
+            const enteredCode = document.getElementById('finalCode').value;
+            const correctCode = gameState.digits.join('');
+            const feedback = document.getElementById('doorFeedback');
+            
+            if (gameState.completedRooms.length < 4) {
+                feedback.className = 'feedback incorrect';
+                feedback.innerHTML = '🔒 You need to complete all rooms first!';
+                return;
+            }
+            
+            if (enteredCode === correctCode) {
+                feedback.className = 'feedback correct';
+                feedback.innerHTML = '🔓 The door is unlocking...';
+                setTimeout(() => {
+                    document.getElementById('mainMenu').style.display = 'none';
+                    document.getElementById('successMessage').classList.add('active');
+                    createConfetti();
+                }, 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.innerHTML = '🔒 Wrong code! Try again!';
+            }
+        }
+
+        // Create confetti effect
+        function createConfetti() {
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = i % 2 === 0 ? '#ff6b00' : '#ffa500';
+                    confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 5000);
+                }, i * 100);
+            }
+        }
+
+        // Reset game
+        function resetGame() {
+            gameState = {
+                digits: [null, null, null, null],
+                completedRooms: [],
+                currentChallenge: null
+            };
+            
+            // Reset UI
+            document.querySelectorAll('.code-digit').forEach(digit => {
+                digit.textContent = '?';
+                digit.classList.remove('revealed');
+            });
+            
+            document.querySelectorAll('.room-card').forEach(room => {
+                room.classList.remove('completed');
+            });
+            
+            document.getElementById('finalCode').value = '';
+            document.getElementById('doorFeedback').innerHTML = '';
+            document.getElementById('codeHint').textContent = 'Complete all 4 rooms to reveal the code!';
+            document.getElementById('successMessage').classList.remove('active');
+            document.getElementById('mainMenu').style.display = 'block';
+            
+            // Reset challenge inputs
+            document.getElementById('accountingAnswer').value = '';
+            document.querySelectorAll('select').forEach(select => select.value = '');
+            
+            // Reset drag items
+            const dragItems = document.querySelectorAll('.drag-item');
+            const dragContainer = document.getElementById('dragItems');
+            dragItems.forEach(item => {
+                if (dragContainer) dragContainer.appendChild(item);
+            });
+        }
+    </script>
+</body>
+</html>
